@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <!-- Primary Meta Tags -->
+  <meta name="title" content="Splatent: Splatting Diffusion Latents for Novel View Synthesis">
+  <meta name="description" content="A principled framework for high-fidelity novel view synthesis in latent-space radiance fields through diffusion-based refinement.">
+  <meta name="keywords" content="3D reconstruction, diffusion models, gaussian splatting, latent space, novel view synthesis, computer vision">
+  <meta name="author" content="Anonymous Authors">
+  <meta name="robots" content="noindex, nofollow">
+  
+  <title>Splatent: Splatting Diffusion Latents for Novel View Synthesis</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="static/images/favicon.ico">
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="static/css/bulma.min.css">
+  <link rel="stylesheet" href="static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="static/css/fontawesome.all.min.css">
+  <link rel="stylesheet" href="static/css/index.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- JavaScript -->
+  <script defer src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="static/js/fontawesome.all.min.js"></script>
+  <script defer src="static/js/bulma-carousel.min.js"></script>
+  <script defer src="static/js/bulma-slider.min.js"></script>
+  <script defer src="static/js/index.js"></script>
+  
+  <style>
+    /* Custom styles for the project page */
+    .method-diagram {
+      margin: 2rem 0;
+      text-align: center;
+    }
+    
+    .method-diagram img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .results-table {
+      overflow-x: auto;
+      margin: 2rem 0;
+    }
+    
+    .results-table table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .results-table th,
+    .results-table td {
+      padding: 0.75rem 1rem;
+      text-align: center;
+      border: 1px solid #e0e0e0;
+    }
+    
+    .results-table th {
+      background: #f5f5f5;
+      font-weight: 600;
+      color: #363636;
+    }
+    
+    .results-table .best-result {
+      font-weight: 700;
+      color: #2563eb;
+    }
+    
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin: 2rem 0;
+    }
+    
+    .comparison-item {
+      text-align: center;
+    }
+    
+    .comparison-item img {
+      width: 100%;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .comparison-label {
+      font-weight: 600;
+      margin-top: 0.75rem;
+      color: #363636;
+    }
+    
+    .section-highlight {
+      background: linear-gradient(to right, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    /* GIF Carousel Styles */
+    .gif-carousel-item {
+      padding: 1.5rem 0.5rem;
+    }
+    
+    .gif-comparison-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .gif-comparison-item {
+      text-align: center;
+    }
+    
+    .gif-comparison-item img {
+      width: 100%;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .gif-comparison-label {
+      font-weight: 600;
+      color: #363636;
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+    }
+    
+    @media (max-width: 768px) {
+      .gif-comparison-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Scroll to Top Button -->
+  <button class="scroll-to-top" onclick="scrollToTop()" title="Scroll to top" aria-label="Scroll to top">
+    <i class="fas fa-chevron-up"></i>
+  </button>
+
+  <main id="main-content">
+  
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-body">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered">
+          <div class="column has-text-centered">
+            <h1 class="title is-1 publication-title">Splatent: Splatting Diffusion Latents for Novel View Synthesis</h1>
+            
+            <div class="is-size-5 publication-authors">
+              <span class="author-block">
+                  <a href="https://orhir.github.io/">Or Hirschorn</a><sup>1,2</sup>&nbsp &nbsp
+                  <a href="https://github.com/Sela-Omer">Omer Sela</a><sup>1,2</sup>&nbsp &nbsp
+                  <a href="https://scholar.google.com/citations?user=YG_1cdEAAAAJ&hl=en">Inbar Huberman-Spiegelglas</a><sup>1</sup>&nbsp &nbsp,
+                  <a href="https://scholar.google.com/citations?user=L0cJiRwAAAAJ&hl=iw&oi=ao">Netalee Efrat</a><sup>1</sup>&nbsp &nbsp
+                  <a href="https://scholar.google.com/citations?user=LirrhvMAAAAJ&hl=en">Eli Alshan</a><sup>1</sup>&nbsp &nbsp
+                  <a href="https://scholar.google.com/citations?user=uOzy7KgAAAAJ&hl=en">Ianir Ideses</a><sup>1</sup>&nbsp &nbsp
+                  <a href="https://scholar.google.com/citations?user=cTJj564AAAAJ&hl=iw">Frederic Devernay</a><sup>1</sup>&nbsp &nbsp
+                  <a href="https://www.amazon.science/author/yochai-zvik">Yochai Zvik</a><sup>1</sup>&nbsp &nbsp
+                  <a href="https://scholar.google.co.il/citations?user=tVSZmfgAAAAJ&hl=en">Lior Fritz</a><sup>1</sup>&nbsp &nbsp
+
+              </span>
+            </div>
+
+          <div class="is-size-5 publication-authors">
+            <span class="author-block"><sup>1</sup>Amazon Prime Video</span> &nbsp &nbsp
+            <span class="author-block"><sup>2</sup>Tel-Aviv University</span> &nbsp &nbsp
+          </div>
+
+            <div class="column has-text-centered">
+              <div class="publication-links">
+
+                <span class="link-block">
+                  <a href="#" class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon"><i class="ai ai-arxiv"></i></span>
+                    <span>arXiv</span>
+                  </a>
+                </span>
+                
+                <span class="link-block">
+                  <a href="https://github.com/orhir/Splatent" class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon"><i class="fab fa-github"></i></span>
+                    <span>
+                      Code - Coming Soon!
+                    </span>
+                  </a>
+                </span>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- Teaser Figure -->
+  <section class="hero teaser" style="padding-top: 0rem; padding-bottom: 0rem">
+    <div class="container is-max-desktop">
+            <h2 class="subtitle has-text-centered">
+          <b>TLDR:</b> We show that the VAE space of current diffusion models is not 3D consistent. To recover details lost in 3D reconstruction, we suggest a 2D diffusion based method to restore lost information.
+      </h2>
+<!--      <div class="hero-body" style="padding-top: 0rem;">-->
+        <div class="method-diagram">
+          <img src="static/images/teaser.png" alt="Splatent Teaser" loading="eager">
+        </div>
+           <!-- Comparison Images Carousel -->
+
+<!--      </div>-->
+    </div>
+  </section>
+
+
+
+  <!-- Abstract -->
+  <section class="section hero is-light">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">Abstract</h2>
+          <div class="content has-text-justified">
+            <p>
+Radiance field representations have recently been explored in the latent space of VAEs that are commonly used by diffusion models. This direction offers efficient rendering and seamless integration with diffusion-based pipelines. 
+However, these methods face a fundamental limitation: The VAE latent space lacks multi-view consistency, leading to blurred textures and missing details during 3D reconstruction. 
+Existing approaches attempt to address this by fine-tuning the VAE, at the cost of reconstruction quality, or by relying on pre-trained diffusion models to recover fine-grained details, at the risk of some hallucinations. 
+We present Splatent, a diffusion-based enhancement framework designed to operate on top of 3D Gaussian Splatting (3DGS) in the latent space of VAEs. 
+Our key insight departs from the conventional 3D-centric view: rather than reconstructing fine-grained details in 3D space, we recover them in 2D from input views through multi-view attention mechanisms. This approach preserves the reconstruction quality of pretrained VAEs while achieving faithful detail recovery.
+Evaluated across multiple benchmarks, Splatent establishes a new state-of-the-art for VAE latent radiance field reconstruction. We further demonstrate that integrating our method with existing feed-forward frameworks, consistently improves detail preservation, opening new possibilities for high-quality sparse-view 3D reconstruction.
+We will release our code upon publication.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+ <!-- Visual Results Section -->
+  <section class="section hero is-small">
+      <div class="hero-body">
+      <div class="container is-max-desktop" style="max-width: 1600px;">
+        <h2 class="title is-3 has-text-centered" style="margin-top: 4rem;">
+          <span class="section-highlight">360° Novel View Synthesis</span>
+        </h2>
+
+        <div id="gif-carousel" class="carousel results-carousel">
+          <!-- Scene 1 -->
+          <div class="item gif-carousel-item">
+            <div style="text-align: center;">
+              <video autoplay muted loop playsinline style="width: 100%; max-width: 1440px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                <source src="static/videos/combined_scene1.mp4" type="video/mp4">
+              </video>
+              <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; max-width: 1440px; margin: 0.75rem auto 0;">
+                <div class="gif-comparison-label">MVSplat360</div>
+                <div class="gif-comparison-label">MVSplat360 + Splatent</div>
+                <div class="gif-comparison-label">Ground Truth</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Scene 2 -->
+          <div class="item gif-carousel-item">
+            <div style="text-align: center;">
+              <video autoplay muted loop playsinline style="width: 100%; max-width: 1440px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                <source src="static/videos/combined_scene2.mp4" type="video/mp4">
+              </video>
+              <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; max-width: 1440px; margin: 0.75rem auto 0;">
+                <div class="gif-comparison-label">MVSplat360</div>
+                <div class="gif-comparison-label">MVSplat360 + Splatent</div>
+                <div class="gif-comparison-label">Ground Truth</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Scene 3 -->
+          <div class="item gif-carousel-item">
+            <div style="text-align: center;">
+              <video autoplay muted loop playsinline style="width: 100%; max-width: 1440px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                <source src="static/videos/combined_scene3.mp4" type="video/mp4">
+              </video>
+              <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; max-width: 1440px; margin: 0.75rem auto 0;">
+                <div class="gif-comparison-label">MVSplat360</div>
+                <div class="gif-comparison-label">MVSplat360 + Splatent</div>
+                <div class="gif-comparison-label">Ground Truth</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Scene 4 -->
+          <div class="item gif-carousel-item">
+            <div style="text-align: center;">
+              <video autoplay muted loop playsinline style="width: 100%; max-width: 1440px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                <source src="static/videos/combined_scene4.mp4" type="video/mp4">
+              </video>
+              <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; max-width: 1440px; margin: 0.75rem auto 0;">
+                <div class="gif-comparison-label">MVSplat360</div>
+                <div class="gif-comparison-label">MVSplat360 + Splatent</div>
+                <div class="gif-comparison-label">Ground Truth</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Scene 5 -->
+          <div class="item gif-carousel-item">
+            <div style="text-align: center;">
+              <video autoplay muted loop playsinline style="width: 100%; max-width: 1440px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                <source src="static/videos/combined_scene5.mp4" type="video/mp4">
+              </video>
+              <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; max-width: 1440px; margin: 0.75rem auto 0;">
+                <div class="gif-comparison-label">MVSplat360</div>
+                <div class="gif-comparison-label">MVSplat360 + Splatent</div>
+                <div class="gif-comparison-label">Ground Truth</div>
+              </div>
+            </div>
+          </div>
+
+      </div>
+      </div>
+      </div>
+  </section>
+
+  <!-- Visual Results Section -->
+  <section class="section hero is-small is-light">
+    <div class="hero-body">
+      <div class="container" style="max-width: 1600px;">
+        <h2 class="title is-3 has-text-centered">
+          <span class="section-highlight">Qualitative Comparisons</span>
+        </h2>
+
+<!--          <section class="hero is-small" style="padding-top: 0.0rem;">-->
+<!--<div class="hero-body" style="padding-top: 0.0rem; padding-bottom: 0.0rem;">-->
+<!--  <div class="container" style="max-width: 1300px;">-->
+    <div id="results-carousel" class="carousel results-carousel">
+      <div class="item"><img src="static/images/comparisons/rank_02_cc08c0bdc34ddd2867705d0b17a86ec2a9d7c7926ce99070ed1fdc66a812de07_000082.png" alt="Comparison"/></div>
+      <div class="item"><img src="static/images/comparisons/rank_04_b5faa2a8ce980030125717352086bf9ec16c5d994bae3b3a732da3eb67cf4fa8_000024.png" alt="Comparison"/></div>
+      <div class="item"><img src="static/images/comparisons/rank_06_06da796666297fe4c683c231edf56ec00148a6a52ab5bb159fe1be31f53a58df_000021.png" alt="Comparison"/></div>
+      <div class="item"><img src="static/images/comparisons/rank_12_800cf88687a79c232700454c2f5a402e771bc7157037a17b0ce93da365b25575_000335.png" alt="Comparison"/></div>
+      <div class="item"><img src="static/images/comparisons/rank_18_8fdc5130f0731360cc053f59049bfe6db509567457c5471c970292966cb34f17_000171.png" alt="Comparison"/></div>
+      <div class="item"><img src="static/images/comparisons/rank_24_adf35184a12d4cfa3f4248b87aa5adb4f39f179df460d6d76136e13d37299a2a_000061.png" alt="Comparison"/></div>
+      <div class="item"><img src="static/images/comparisons/rank_30_493816813d2d6d248eb3c2b0b77b63e54235266e9a06e270fd0d282f13960493_000104.png" alt="Comparison"/></div>
+      <div class="item"><img src="static/images/comparisons/rank_36_8fdc5130f0731360cc053f59049bfe6db509567457c5471c970292966cb34f17_000056.png" alt="Comparison"/></div>
+      <div class="item"><img src="static/images/comparisons/rank_42_ff592398657b3dfe94153332861985194a3e3c9d199c4a3a27a0ce4038e81ade_000154.png" alt="Comparison"/></div>
+      <div class="item"><img src="static/images/comparisons/rank_48_8b9fb9d9f10e8c64d5034be69809465753b8ba88ef12da82afd47d38ee789934_000077.png" alt="Comparison"/></div>
+      <div class="item"><img src="static/images/comparisons/rank_54_9c8c0e0fadd97abf60088f667eba058ef077a71a8c0f5a4eff2782aa97f1ceb8_000122.png" alt="Comparison"/></div>
+      <div class="item"><img src="static/images/comparisons/rank_60_dac9796dd69e1c25277e29d7e30af4f21e3b575d62a0a208c2b3d1211e2d5d77_000177.png" alt="Comparison"/></div>
+      <div class="item"><img src="static/images/comparisons/rank_66_35872363e17af5d173b6a0b09fcf5de94627ad5dc5f8a9ad4c579f3e70b4797a_000184.png" alt="Comparison"/></div>
+      <div class="item"><img src="static/images/comparisons/rank_72_50c46cf8b8b22c8d2ffdef8964b05ddbceaef312c9a9ff331d1ecebfd223f72a_000006.png" alt="Comparison"/></div>
+      <div class="item"><img src="static/images/comparisons/rank_84_7705a2edd022de9da3f8cead677287645986e982d9247a21e1992859a59f8335_000062.png" alt="Comparison"/></div>
+      <div class="item"><img src="static/images/comparisons/rank_103_ef59aac437132bfc1dd45a7e1f8e4800978e7bb28bf98c4428d26fb3e1da3e90_000061.png" alt="Comparison"/></div>
+      <div class="item"><img src="static/images/comparisons/rank_114_917e9c8985d353b0ee4c281f11fa84eb8550814562670cbb82cd0ec9c1194fe7_000026.png" alt="Comparison"/></div>
+      <div class="item"><img src="static/images/comparisons/rank_125_565553aa894be621e8b4773cac288e60ad0c2cf7edb621be62b348c9a0f78380_000304.png" alt="Comparison"/></div>
+      <div class="item"><img src="static/images/comparisons/rank_136_8fdc5130f0731360cc053f59049bfe6db509567457c5471c970292966cb34f17_000050.png" alt="Comparison"/></div>
+    </div>
+
+<!--  </div>-->
+<!--</div>-->
+<!--</section>-->
+        
+        <div id="qualitative-supp-carousel" class="carousel results-carousel" style="margin-bottom: 3rem;">
+          <!-- Row 1 -->
+          <div class="item">
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; margin-bottom: 0.5rem;">
+              <div style="text-align: center; font-weight: 600; padding: 0.25rem; font-size: 0.9rem;">Feature-3DGS</div>
+              <div style="text-align: center; font-weight: 600; padding: 0.25rem; font-size: 0.9rem;">LRF</div>
+              <div style="text-align: center; font-weight: 600; padding: 0.25rem; font-size: 0.9rem;">Splatent (Ours)</div>
+              <div style="text-align: center; font-weight: 600; padding: 0.25rem; font-size: 0.9rem;">Ground Truth</div>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem;">
+              <img src="static/images/qualitative_supp/input_06da796666297fe4c683c231edf56ec00148a6a52ab5bb159fe1be31f53a58df.png" alt="Input" loading="lazy" style="width: 100%;">
+              <img src="static/images/qualitative_supp/lrf_06da796666297fe4c683c231edf56ec00148a6a52ab5bb159fe1be31f53a58df.png" alt="LRF" loading="lazy" style="width: 100%;">
+              <img src="static/images/qualitative_supp/ours_06da796666297fe4c683c231edf56ec00148a6a52ab5bb159fe1be31f53a58df.png" alt="Ours" loading="lazy" style="width: 100%;">
+              <img src="static/images/qualitative_supp/gt_06da796666297fe4c683c231edf56ec00148a6a52ab5bb159fe1be31f53a58df.png" alt="GT" loading="lazy" style="width: 100%;">
+            </div>
+          </div>
+          
+          <!-- Row 2 -->
+          <div class="item">
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; margin-bottom: 0.5rem;">
+              <div style="text-align: center; font-weight: 600; padding: 0.25rem; font-size: 0.9rem;">Feature-3DGS</div>
+              <div style="text-align: center; font-weight: 600; padding: 0.25rem; font-size: 0.9rem;">LRF</div>
+              <div style="text-align: center; font-weight: 600; padding: 0.25rem; font-size: 0.9rem;">Splatent (Ours)</div>
+              <div style="text-align: center; font-weight: 600; padding: 0.25rem; font-size: 0.9rem;">Ground Truth</div>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem;">
+              <img src="static/images/qualitative_supp/input_14eb48a50e37df548894ab6d8cd628a21dae14bbe6c462e894616fc5962e6c49.png" alt="Input" loading="lazy" style="width: 100%;">
+              <img src="static/images/qualitative_supp/lrf_14eb48a50e37df548894ab6d8cd628a21dae14bbe6c462e894616fc5962e6c49.png" alt="LRF" loading="lazy" style="width: 100%;">
+              <img src="static/images/qualitative_supp/ours_14eb48a50e37df548894ab6d8cd628a21dae14bbe6c462e894616fc5962e6c49.png" alt="Ours" loading="lazy" style="width: 100%;">
+              <img src="static/images/qualitative_supp/gt_14eb48a50e37df548894ab6d8cd628a21dae14bbe6c462e894616fc5962e6c49.png" alt="GT" loading="lazy" style="width: 100%;">
+            </div>
+          </div>
+          
+          <!-- Row 3 -->
+          <div class="item">
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; margin-bottom: 0.5rem;">
+              <div style="text-align: center; font-weight: 600; padding: 0.25rem; font-size: 0.9rem;">Feature-3DGS</div>
+              <div style="text-align: center; font-weight: 600; padding: 0.25rem; font-size: 0.9rem;">LRF</div>
+              <div style="text-align: center; font-weight: 600; padding: 0.25rem; font-size: 0.9rem;">Splatent (Ours)</div>
+              <div style="text-align: center; font-weight: 600; padding: 0.25rem; font-size: 0.9rem;">Ground Truth</div>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem;">
+              <img src="static/images/qualitative_supp/input_280abf7bd93b81b077af1db638229dbb09869052fa0b7b57c81c94d2db893829.png" alt="Input" loading="lazy" style="width: 100%;">
+              <img src="static/images/qualitative_supp/lrf_280abf7bd93b81b077af1db638229dbb09869052fa0b7b57c81c94d2db893829.png" alt="LRF" loading="lazy" style="width: 100%;">
+              <img src="static/images/qualitative_supp/ours_280abf7bd93b81b077af1db638229dbb09869052fa0b7b57c81c94d2db893829.png" alt="Ours" loading="lazy" style="width: 100%;">
+              <img src="static/images/qualitative_supp/gt_280abf7bd93b81b077af1db638229dbb09869052fa0b7b57c81c94d2db893829.png" alt="GT" loading="lazy" style="width: 100%;">
+            </div>
+          </div>
+          
+          <!-- Row 4 -->
+          <div class="item">
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; margin-bottom: 0.5rem;">
+              <div style="text-align: center; font-weight: 600; padding: 0.25rem; font-size: 0.9rem;">Feature-3DGS</div>
+              <div style="text-align: center; font-weight: 600; padding: 0.25rem; font-size: 0.9rem;">LRF</div>
+              <div style="text-align: center; font-weight: 600; padding: 0.25rem; font-size: 0.9rem;">Splatent (Ours)</div>
+              <div style="text-align: center; font-weight: 600; padding: 0.25rem; font-size: 0.9rem;">Ground Truth</div>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem;">
+              <img src="static/images/qualitative_supp/input_457e9a1ae777b0c72be723aaeec971b39cc6d5d413d922f981ec9785395f7ca9.png" alt="Input" loading="lazy" style="width: 100%;">
+              <img src="static/images/qualitative_supp/lrf_457e9a1ae777b0c72be723aaeec971b39cc6d5d413d922f981ec9785395f7ca9.png" alt="LRF" loading="lazy" style="width: 100%;">
+              <img src="static/images/qualitative_supp/ours_457e9a1ae777b0c72be723aaeec971b39cc6d5d413d922f981ec9785395f7ca9.png" alt="Ours" loading="lazy" style="width: 100%;">
+              <img src="static/images/qualitative_supp/gt_457e9a1ae777b0c72be723aaeec971b39cc6d5d413d922f981ec9785395f7ca9.png" alt="GT" loading="lazy" style="width: 100%;">
+            </div>
+          </div>
+          
+          <!-- Row 5 -->
+          <div class="item">
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; margin-bottom: 0.5rem;">
+              <div style="text-align: center; font-weight: 600; padding: 0.25rem; font-size: 0.9rem;">Feature-3DGS</div>
+              <div style="text-align: center; font-weight: 600; padding: 0.25rem; font-size: 0.9rem;">LRF</div>
+              <div style="text-align: center; font-weight: 600; padding: 0.25rem; font-size: 0.9rem;">Splatent (Ours)</div>
+              <div style="text-align: center; font-weight: 600; padding: 0.25rem; font-size: 0.9rem;">Ground Truth</div>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem;">
+              <img src="static/images/qualitative_supp/input_d9b6376623741313bf6da6bf4cdb9828be614a2ce9390ceb3f31cd535d661a75.png" alt="Input" loading="lazy" style="width: 100%;">
+              <img src="static/images/qualitative_supp/lrf_d9b6376623741313bf6da6bf4cdb9828be614a2ce9390ceb3f31cd535d661a75.png" alt="LRF" loading="lazy" style="width: 100%;">
+              <img src="static/images/qualitative_supp/ours_d9b6376623741313bf6da6bf4cdb9828be614a2ce9390ceb3f31cd535d661a75.png" alt="Ours" loading="lazy" style="width: 100%;">
+              <img src="static/images/qualitative_supp/gt_d9b6376623741313bf6da6bf4cdb9828be614a2ce9390ceb3f31cd535d661a75.png" alt="GT" loading="lazy" style="width: 100%;">
+            </div>
+          </div>
+          
+          <!-- Row 6 -->
+          <div class="item">
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; margin-bottom: 0.5rem;">
+              <div style="text-align: center; font-weight: 600; padding: 0.25rem; font-size: 0.9rem;">Feature-3DGS</div>
+              <div style="text-align: center; font-weight: 600; padding: 0.25rem; font-size: 0.9rem;">LRF</div>
+              <div style="text-align: center; font-weight: 600; padding: 0.25rem; font-size: 0.9rem;">Splatent (Ours)</div>
+              <div style="text-align: center; font-weight: 600; padding: 0.25rem; font-size: 0.9rem;">Ground Truth</div>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem;">
+              <img src="static/images/qualitative_supp/input_63798f5c6fbfcb4eb686268248b8ecbc8d87d920b2bcce967eeaedfd3b3b6d82.png" alt="Input" loading="lazy" style="width: 100%;">
+              <img src="static/images/qualitative_supp/lrf_63798f5c6fbfcb4eb686268248b8ecbc8d87d920b2bcce967eeaedfd3b3b6d82.png" alt="LRF" loading="lazy" style="width: 100%;">
+              <img src="static/images/qualitative_supp/ours_63798f5c6fbfcb4eb686268248b8ecbc8d87d920b2bcce967eeaedfd3b3b6d82.png" alt="Ours" loading="lazy" style="width: 100%;">
+              <img src="static/images/qualitative_supp/gt_63798f5c6fbfcb4eb686268248b8ecbc8d87d920b2bcce967eeaedfd3b3b6d82.png" alt="GT" loading="lazy" style="width: 100%;">
+            </div>
+          </div>
+          
+          <!-- Row 7 -->
+          <div class="item">
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; margin-bottom: 0.5rem;">
+              <div style="text-align: center; font-weight: 600; padding: 0.25rem; font-size: 0.9rem;">Feature-3DGS</div>
+              <div style="text-align: center; font-weight: 600; padding: 0.25rem; font-size: 0.9rem;">LRF</div>
+              <div style="text-align: center; font-weight: 600; padding: 0.25rem; font-size: 0.9rem;">Splatent (Ours)</div>
+              <div style="text-align: center; font-weight: 600; padding: 0.25rem; font-size: 0.9rem;">Ground Truth</div>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem;">
+              <img src="static/images/qualitative_supp/input_1ba74c22670ad047981441581d00f26f4a148d1010bcac7468c615adf5fa4d5d.png" alt="Input" loading="lazy" style="width: 100%;">
+              <img src="static/images/qualitative_supp/lrf_1ba74c22670ad047981441581d00f26f4a148d1010bcac7468c615adf5fa4d5d.png" alt="LRF" loading="lazy" style="width: 100%;">
+              <img src="static/images/qualitative_supp/ours_1ba74c22670ad047981441581d00f26f4a148d1010bcac7468c615adf5fa4d5d.png" alt="Ours" loading="lazy" style="width: 100%;">
+              <img src="static/images/qualitative_supp/gt_1ba74c22670ad047981441581d00f26f4a148d1010bcac7468c615adf5fa4d5d.png" alt="GT" loading="lazy" style="width: 100%;">
+            </div>
+          </div>
+          
+          <!-- Row 8 -->
+          <div class="item">
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; margin-bottom: 0.5rem;">
+              <div style="text-align: center; font-weight: 600; padding: 0.25rem; font-size: 0.9rem;">Feature-3DGS</div>
+              <div style="text-align: center; font-weight: 600; padding: 0.25rem; font-size: 0.9rem;">LRF</div>
+              <div style="text-align: center; font-weight: 600; padding: 0.25rem; font-size: 0.9rem;">Splatent (Ours)</div>
+              <div style="text-align: center; font-weight: 600; padding: 0.25rem; font-size: 0.9rem;">Ground Truth</div>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem;">
+              <img src="static/images/qualitative_supp/input_2b65ba886efac7af6253fce68ae9284bf4d4db019e17c47f3e853361acbdb066.png" alt="Input" loading="lazy" style="width: 100%;">
+              <img src="static/images/qualitative_supp/lrf_2b65ba886efac7af6253fce68ae9284bf4d4db019e17c47f3e853361acbdb066.png" alt="LRF" loading="lazy" style="width: 100%;">
+              <img src="static/images/qualitative_supp/ours_2b65ba886efac7af6253fce68ae9284bf4d4db019e17c47f3e853361acbdb066.png" alt="Ours" loading="lazy" style="width: 100%;">
+              <img src="static/images/qualitative_supp/gt_2b65ba886efac7af6253fce68ae9284bf4d4db019e17c47f3e853361acbdb066.png" alt="GT" loading="lazy" style="width: 100%;">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Method Section -->
+
+  <section class="section">
+    <div class="container is-max-desktop">
+      <h2 class="title is-3 has-text-centered">Multi-View Inconsistencies in VAE Latents</h2>
+      
+      <div class="content has-text-justified">
+        <p>
+Our work is driven by the observation that existing VAE models, such as Stable Diffusion VAE, produce latent representations that lack 3D consistency, limiting their direct use for 3D scene reconstruction and novel view synthesis. 
+This limitation arises from two related spectral deficiencies. First, the latent spaces fail to maintain equivariance under basic spatial transformations like scaling and rotation. Second, and more importantly, view-dependent high-frequency components, essential for accurate decoding, exhibit the most severe 3D inconsistencies across viewpoints, unlike in RGB space.
+When optimizing 3D Gaussian splatting in latent space, this spectral inconsistency becomes particularly problematic.
+</p>
+      </div>
+
+      <div class="method-diagram">
+        <img src="static/images/spectral.png" alt="Spectral Analysis">
+        <p style="margin-top: 1rem; font-weight: 600; color: #363636;">
+          <strong>VAE latents spectral analysis:</strong> Magnitude spectrum of the latent image using different VAE models. During 3DGS optimization, inconsistent high frequencies average out, leaving only low-frequency components and causing blurry decoded images.
+        </p>
+      </div>
+
+  </section>
+
+  <section class="section">
+    <div class="container is-max-desktop">
+      <h2 class="title is-3 has-text-centered">Method</h2>
+      
+      <div class="content has-text-justified">
+        <p>
+          We optimize 3D Gaussian splatting in VAE latent space, then refine rendered latents using a diffusion-based module. Our key insight: rather than reconstructing details in 3D, we recover them in 2D from input views through multi-view attention mechanisms.
+          We condition a diffusion model on reference views arranged in a spatial grid. During denoising, multi-view attention propagates high-frequency details from references to the rendered latent, recovering lost information while keeping the VAE frozen.
+
+        </p>
+      </div>
+
+      <div class="method-diagram">
+        <img src="static/images/splatent_architecture.png" alt="Splatent Architecture">
+        <p style="margin-top: 1rem; font-weight: 600; color: #363636;">
+          <strong>Splatent Architecture:</strong> Our two-stage pipeline first optimizes latent 3DGS, then refines rendered latents using diffusion with multi-view attention to recover high-frequency details.
+        </p>
+      </div>
+
+    </div>
+  </section>
+
+
+
+<!--BibTex citation -->
+  <section class="section" id="BibTeX">
+    <div class="container is-max-desktop content">
+      <div class="bibtex-header">
+        <h2 class="title">BibTeX</h2>
+        <button class="copy-bibtex-btn" onclick="copyBibTeX()" title="Copy BibTeX to clipboard">
+          <i class="fas fa-copy"></i>
+          <span class="copy-text">Copy</span>
+        </button>
+      </div>
+      <pre id="bibtex-code"><code>@article{Splatent2025,
+  title={Splatent: Splatting Diffusion Latents for Novel View Synthesis},
+  author={To be updated},
+  journal={Preprint},
+  year={2025},
+  url={}
+}</code></pre>
+    </div>
+</section>
+<!--End BibTex citation -->
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="columns is-centered">
+        <div class="column is-8">
+          <div class="content">
+            <p>
+              This page was built using the <a href="https://github.com/eliahuhorwitz/Academic-project-page-template" target="_blank">Academic Project Page Template</a> which was adopted from the <a href="https://nerfies.github.io" target="_blank">Nerfies</a> project page.
+              <br> This website is licensed under a <a rel="license" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">Creative Commons Attribution-Noncommercial 4.0 International License</a>.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
