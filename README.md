@@ -15,8 +15,13 @@ Splatent enhances novel view synthesis by leveraging Stable Diffusion Turbo that
 If you use this code in your research, please cite:
 
 ```bibtex
-@article{splatent2024,
-  title={Splatent: Reference-based Diffusion Enhancement for 3D Gaussian Splatting},
-  year={2024}
+@article{splatent2025,
+      title={Splatent: Splatting Diffusion Latents for Novel View Synthesis}, 
+      author={Or Hirschorn and Omer Sela and Inbar Huberman-Spiegelglas and Netalee Efrat and Eli Alshan and Ianir Ideses and Frederic Devernay and Yochai Zvik and Lior Fritz},
+      year={2025},
+      eprint={2512.09923},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2512.09923}, 
 }
 ```
