@@ -1,0 +1,19 @@
+torch
+torchvision
+torchmetrics
+imageio[ffmpeg]
+einops
+lpips
+xformers
+peft==0.9.0
+diffusers==0.25.1
+huggingface-hub==0.25.1
+transformers==4.38.0
+scikit-learn
+seaborn
+matplotlib
+opencv-python
+
+# Experiment tracking (choose one or both)
+# clearml  # For ClearML logging
+tensorboard  # For TensorBoard logging (fallback)
