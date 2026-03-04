@@ -1,3 +1,7 @@
+<a href="https://orhir.github.io/Splatent/"><img src="https://img.shields.io/static/v1?label=Project&message=Website&color=blue"></a>
+<a href="https://arxiv.org/abs/2512.09923"><img src="https://img.shields.io/badge/arXiv-2512.09923-b31b1b.svg"></a>
+<a href="https://orhir.github.io/Splatent/static/pdfs/Splatent_supplementary.pdf"><img src="https://img.shields.io/static/v1?label=PDF&message=Supplemenraty&color=orange"></a>
+
 # Splatent: Reference-based Diffusion Enhancement for 3D Gaussian Splatting [CVPR 2026]
 
 A PyTorch implementation of a reference-based diffusion model for enhancing latent features in 3D Gaussian Splatting novel view synthesis.
